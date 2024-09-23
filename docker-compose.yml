@@ -1,0 +1,50 @@
+version: '3.5'
+
+services:
+
+  postgres:
+    container_name: guiaflama-postgres
+    image: postgres
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    volumes:
+      - guiaflama:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+    networks:
+      - guiaflama
+
+  express:
+    container_name: guiaflama-express
+    image: guiaflama-express
+    build: .
+    depends_on:
+      - postgres
+    environment:
+      NODE_ENV: development
+      POSTGRES_HOST: host.docker.internal
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    ports:
+      - "4000:4000"
+    networks:
+      - guiaflama
+
+  adminer:
+    container_name: 'guiaflama-adminer'
+    image: adminer
+    depends_on:
+      - postgres
+    ports:
+      - 8080:8080
+    networks:
+      - guiaflama
+
+volumes:
+  guiaflama:
+  
+networks:
+  guiaflama:
